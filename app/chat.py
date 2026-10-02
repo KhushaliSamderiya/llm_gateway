@@ -1,12 +1,13 @@
 import time
 import uuid
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from fastapi.concurrency import run_in_threadpool
 
 from app.auth import AuthContext
 from app.budget import check_budget, record_spend
 from app.errors import GatewayError
+from app.pii import redact_messages
 from app.pricing import compute_cost
 from app.providers.base import ProviderError
 from app.providers.registry import get_provider
@@ -21,6 +22,7 @@ router = APIRouter()
 async def chat_completions(
     request: ChatRequest,
     background: BackgroundTasks,
+    response: Response,
     auth: AuthContext = Depends(rate_limited),
 ):
     if request.stream:
@@ -32,6 +34,14 @@ async def chat_completions(
         )
 
     await check_budget(auth)
+
+    # Mask PII before anything else sees the prompt (provider, and later the cache)
+    clean_messages, redactions = redact_messages(request.messages)
+    request = request.model_copy(update={"messages": clean_messages})
+    if redactions:
+        response.headers["X-Gateway-PII-Redacted"] = ",".join(
+            f"{label}={count}" for label, count in sorted(redactions.items())
+        )
 
     provider = get_provider(request.model)
 
