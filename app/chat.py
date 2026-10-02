@@ -4,7 +4,8 @@ import uuid
 from fastapi import APIRouter, BackgroundTasks, Depends
 from fastapi.concurrency import run_in_threadpool
 
-from app.auth import AuthContext, authenticate
+from app.auth import AuthContext
+from app.ratelimit import rate_limited
 from app.errors import GatewayError
 from app.providers.base import ProviderError
 from app.providers.registry import get_provider
@@ -18,7 +19,7 @@ router = APIRouter()
 async def chat_completions(
     request: ChatRequest,
     background: BackgroundTasks,
-    auth: AuthContext = Depends(authenticate),
+    auth: AuthContext = Depends(rate_limited),
 ):
     if request.stream:
         raise GatewayError(
