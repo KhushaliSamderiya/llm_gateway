@@ -5,10 +5,12 @@ from fastapi import APIRouter, BackgroundTasks, Depends
 from fastapi.concurrency import run_in_threadpool
 
 from app.auth import AuthContext
-from app.ratelimit import rate_limited
+from app.budget import check_budget, record_spend
 from app.errors import GatewayError
+from app.pricing import compute_cost
 from app.providers.base import ProviderError
 from app.providers.registry import get_provider
+from app.ratelimit import rate_limited
 from app.schemas import ChatRequest
 from app.usage import record_request
 
@@ -28,6 +30,8 @@ async def chat_completions(
             "invalid_request_error",
             "streaming_not_supported",
         )
+
+    await check_budget(auth)
 
     provider = get_provider(request.model)
 
@@ -64,6 +68,10 @@ async def chat_completions(
         completion_tokens=result.completion_tokens,
         latency_ms=latency_ms,
         status_code=200,
+    )
+    await record_spend(
+        auth.team_id,
+        compute_cost(result.model, result.prompt_tokens, result.completion_tokens),
     )
 
     return {
