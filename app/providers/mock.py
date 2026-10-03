@@ -6,11 +6,12 @@ from app.schemas import ChatRequest
 
 
 class MockProvider(Provider):
-    name = "mock"
-
-    def __init__(self, delay_ms: int = 200, failure_rate: float = 0.0):
+    def __init__(
+        self, delay_ms: int = 200, failure_rate: float = 0.0, name: str = "mock"
+    ):
         self.delay_ms = delay_ms
         self.failure_rate = failure_rate
+        self.name = name
 
     async def chat(self, request: ChatRequest) -> ProviderResult:
         await asyncio.sleep(self.delay_ms / 1000)
