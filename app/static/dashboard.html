@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Gateway · Usage</title>
+<link rel="stylesheet" href="/dashboard/assets/dashboard.css">
+</head>
+<body>
+<header>
+  <h1>LLM Gateway</h1>
+  <form id="controls" autocomplete="off">
+    <input id="key" type="password" placeholder="Admin key" required aria-label="Admin key">
+    <select id="days" aria-label="Time window">
+      <option value="1">24 hours</option>
+      <option value="7" selected>7 days</option>
+      <option value="30">30 days</option>
+    </select>
+    <select id="group" aria-label="Group by">
+      <option value="team">by team</option>
+      <option value="model">by model</option>
+      <option value="provider">by provider</option>
+      <option value="day">by day</option>
+    </select>
+    <button type="submit">Load</button>
+  </form>
+</header>
+<main>
+  <p id="status" role="status">Enter your admin key to load usage.</p>
+  <section id="cards" class="cards" hidden></section>
+  <div id="tablewrap" class="scroll" hidden><table id="table"></table></div>
+</main>
+<script src="/dashboard/assets/dashboard.js"></script>
+</body>
+</html>

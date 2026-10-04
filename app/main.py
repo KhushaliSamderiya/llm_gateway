@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 from app.admin import router as admin_router
 from app.chat import router as chat_router
+from app.dashboard import router as dashboard_router
 from app.config import settings  # noqa: F401  (loading it validates the config at startup)
 from app.errors import GatewayError
 from app.usage_api import router as usage_router
@@ -12,6 +13,7 @@ app = FastAPI(title="LLM Gateway")
 app.include_router(chat_router)
 app.include_router(admin_router)
 app.include_router(usage_router)
+app.include_router(dashboard_router)
 
 
 def _error(
