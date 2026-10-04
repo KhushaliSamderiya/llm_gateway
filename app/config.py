@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     gemini_api_key: str
     database_url: str
     redis_url: str
+    # Empty means the admin API is disabled (it fails closed, with no default password)
+    admin_api_key: str = ""
     mock_delay_ms: int = 200
     mock_failure_rate: float = 0.0
 

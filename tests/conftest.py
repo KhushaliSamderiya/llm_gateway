@@ -4,6 +4,7 @@ import os
 os.environ["DATABASE_URL"] = "postgresql://gateway:gateway@localhost:5432/gateway_test"
 os.environ["REDIS_URL"] = "redis://localhost:6379/1"
 os.environ["GEMINI_API_KEY"] = "test-key-not-real"
+os.environ["ADMIN_API_KEY"] = "adm_test_admin_key"
 os.environ["MOCK_DELAY_MS"] = "0"
 os.environ["MOCK_FAILURE_RATE"] = "0"
 
