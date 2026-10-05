@@ -1,0 +1,35 @@
+Gateway: http://localhost:8000   (fresh demo teams: demo-1790990019-*)
+
+=== 1. Authentication ===
+  PASS  no key is rejected  (missing_api_key)
+  PASS  wrong key is rejected  (invalid_api_key)
+  PASS  valid key is accepted
+
+=== 2. PII redaction ===
+  provider saw: [mock] You said: Contact [EMAIL], card [CARD_NUMBER], SSN [SSN]
+  PASS  PII types reported in a header  (CARD_NUMBER=1,EMAIL=1,SSN=1)
+  PASS  raw values never reached the provider
+
+=== 3. Response cache ===
+  PASS  first request goes to the provider  (214 ms)
+  PASS  identical request is served from cache  (6 ms)
+  PASS  the cache hit is faster
+
+=== 4. Rate limiting (this key allows 5 requests/minute) ===
+  status codes: [200, 200, 200, 200, 200, 429, 429, 429]
+  PASS  first 5 allowed, next 3 rejected
+  PASS  rejection says when to retry  (retry in 59s)
+
+=== 5. Budget enforcement (this team has a $0 budget) ===
+  PASS  over-budget team is blocked  (monthly_budget_exceeded)
+
+=== 6. Provider failover ===
+  PASS  answered even though the primary provider is down  (411 ms)
+  PASS  response reports which provider failed
+  PASS  every provider down gives a clean 502  (provider_error)
+
+=== 7. Real model (Gemini, free tier) ===
+  PASS  real answer returned  (778 ms)
+  PASS  repeat served from cache  (8 ms, about 98x faster)
+
+16 of 16 checks passed
